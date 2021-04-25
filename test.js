@@ -80,7 +80,7 @@ script.registerModule({
 	module.on("update", function () {
 		if (mc.thePlayer.onGround) {
 			mc.thePlayer.jump();
-			mc.thePlayer.motionY = 0.52;
+			mc.thePlayer.motionY = 0.42;
 		} else {
 			mc.thePlayer.capabilities.isFlying = true;
 			mc.thePlayer.motionY -= 0.01;
