@@ -119,7 +119,8 @@ script.registerModule({
 	});
 });
 
-var killSults = [ "%s just got core'd!", "%s, magine getting killed by a LiquidBounce free addon.", "RedeCore is on top of %s!" ];
+var killSults = [ "%s just got core'd!", "%s, magine getting killed by a LiquidBounce free addon.", "RedeCore is on top of %s!", 
+				"Get good, get RedeCore (https://bit.ly/2QtDcwM)" ];
 
 function getRandomSult(name) {
 	return killSults[Math.floor((Math.random()*killSults.length))].toString().replace("%s", name.toString());
