@@ -1,10 +1,13 @@
 /// api_version=2
 var C03PacketPlayer = Java.type("net.minecraft.network.play.client.C03PacketPlayer");
 var S02PacketChat = Java.type("net.minecraft.network.play.server.S02PacketChat");
+var Pattern = Java.type("java.util.regex.Pattern");
+var Matcher = Java.type("java.util.regex.Matcher");
+
 var script = registerScript({
 	name: "RedeCore",
 	version: "1.0.0",
-	authors: ["DavidMagMC"]
+	authors: ["DavidMagMC", "0x16#7207"]
 });
 script.registerModule({
 	name: "RedeCore",
@@ -106,25 +109,45 @@ script.registerModule({
 	name: "RedeSults",
 	category: "Combat",
 	description: "Redesky killsults",
+	settings: { //Added send timeout and message type
+	    sendType: Setting.list({
+		    name: "SendMessage-Type",
+		    default: "Public",
+		    values: ["Public", "Private"]
+	    }),
+	    sendDelay: Setting.integer({
+		    name: "SendMessage-Delay",
+		    default: 0,
+		    min: 0,
+		    max: 5000
+	    })
+	}
 }, function (module) {
 	module.on("packet", function(event) {
 		var packet = event.getPacket();
-		if (packet instanceof S02PacketChat) {
+		if (packet instanceof S02PacketChat) { //Better message detection using Pattern and Matcher Java class. TODO detect new Redesky death message packs
             var a = packet.getChatComponent().getUnformattedText();
-            if (a.indexOf("foi morto por " + mc.thePlayer.getName()) != -1) {
-                var split = a.replace(" foi morto por " + mc.thePlayer.getName(), "").replace(".", "").replace("!", "").replace("FINAL", "").split(' ');
-                mc.thePlayer.sendChatMessage(getRandomSult(split[0]));
-            }
+	    var patternMatcher = Pattern.compile("(.*) foi morto por (.*)");
+	    var matchReturn = patternMatcher.matcher(a);
+	    if (!matchReturn.find()) return;
+	    var chatTarget = matchReturn.group(1);
+	    var killer = matchReturn.group(2);
+	    if (killer.equalsIgnoreCase(mc.thePlayer.getName()))
+                mc.thePlayer.sendChatMessage(getRandomSult(chatTarget), (module.settings.sendType.get() == "Private"));
 		}
 	});
 });
 
-var killSults = [ "%s just got core'd!", "%s, magine getting killed by a LiquidBounce free addon.", "RedeCore is on top of %s!", 
+var killSults = [ "%s just got core'd!", "%s, imagine getting killed by a LiquidBounce free addon.", "RedeCore is on top of %s!", 
 				"Get good, get RedeCore (https://bit.ly/2QtDcwM)" ];
 
-function getRandomSult(name) {
-	return killSults[Math.floor((Math.random()*killSults.length))].toString().replace("%s", name.toString());
+function getRandomSult(name, private) { //didn't test this
+	if (private) return "/msg " + name + " " + killSults[Math.floor((Math.random()*killSults.length))].toString().replace("%s, ", "").replace("%s", "you");
+	return killSults[Math.floor((Math.random()*killSults.length))].toString().replace("%s", name);
 }
+
+var Timer = Java.type('java.util.Timer');
+function timeout(ms, func) (_timer = new Timer("setTimeout", true), _timer.schedule(func, ms), _timer);
 
 function spoof(y, onGround) {
 	mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + y, mc.thePlayer.posZ, onGround));
