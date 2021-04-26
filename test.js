@@ -133,7 +133,9 @@ script.registerModule({
 	    var chatTarget = matchReturn.group(1);
 	    var killer = matchReturn.group(2);
 	    if (killer.equalsIgnoreCase(mc.thePlayer.getName()))
-                mc.thePlayer.sendChatMessage(getRandomSult(chatTarget), (module.settings.sendType.get() == "Private"));
+                timeout(module.settings.sendDelay.get(), function() {
+			mc.thePlayer.sendChatMessage(getRandomSult(chatTarget), (module.settings.sendType.get() == "Private"))
+		});
 		}
 	});
 });
