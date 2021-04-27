@@ -13,7 +13,7 @@ var Matcher = Java.type("java.util.regex.Matcher");
 var script = registerScript({
 	name: "RedeCore",
 	version: "1.0.0",
-	authors: ["DavidMagMC", "0x16#7207"]
+	authors: ["DavidMagMC", "0x16#7207", "xazed"]
 });
 script.registerModule({
 	name: "RedeCore",
