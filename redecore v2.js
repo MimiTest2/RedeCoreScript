@@ -45,12 +45,18 @@ script.registerModule({
 	description: "Redesky glide"
 }, function (module) {
 	module.on("update", function () {
-		if (mc.thePlayer.onGround) {
-			mc.thePlayer.jump();
-		} else {
-			mc.timer.timerSpeed = 5.0;
-            mc.thePlayer.motionY += 0.07;
-            mc.thePlayer.speedInAir = 0.08;
+			if (mc.thePlayer.onGround) {
+				mc.thePlayer.jump();
+			} else {
+  			mc.timer.timerSpeed = 2.0;
+                            mc.thePlayer.motionY += 0.01;
+                            mc.thePlayer.speedInAir = 0.08;
+                            var  motiony = mc.thePlayer.motionY;
+                            mc.thePlayer.jump();
+                            mc.thePlayer.motionX *= 0.79;
+                            mc.thePlayer.motionZ *= 0.79;
+                            mc.thePlayer.motionY = motiony;
+			}
         }
     });
 	module.on("disable", function() {
