@@ -23,38 +23,78 @@ function getPrefix() {
 	return "§7[§cRedeCore §bv2§7] §f";
 }
 script.registerModule({
+	name: "RedeSpeed",
+	category: "Movement",
+	description: "Redesky speed",
+}, function (module) {
+	module.on("update", function () {
+		if (mc.thePlayer.onGround) {
+			mc.thePlayer.jump();
+			mc.timer.timerSpeed = 5.0;
+		} else {
+			mc.timer.timerSpeed = 1.0;
+        }
+    });
+	module.on("disable", function() {
+		mc.timer.timerSpeed = 1;
+	});
+});
+script.registerModule({
 	name: "RedeGlide",
 	category: "Movement",
-	description: "Redesky glide",
+	description: "Redesky glide"
 }, function (module) {
 	module.on("update", function () {
 		if (mc.thePlayer.onGround) {
 			mc.thePlayer.jump();
 		} else {
-            mc.timer.timerSpeed = 5.0;
+			mc.timer.timerSpeed = 5.0;
             mc.thePlayer.motionY += 0.07;
             mc.thePlayer.speedInAir = 0.08;
-            mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, onGround));
-            mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(mc.thePlayer.posX + 31, mc.thePlayer.posY + 16, mc.thePlayer.posZ + 11, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, onGround));
         }
     });
 	module.on("disable", function() {
         mc.thePlayer.speedInAir = 0.02;
 		mc.timer.timerSpeed = 1;
-		ticks = 0;
 	});
 });
+
+function getSpeed() {
+	return Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
+}
+
+function getDirection() {
+	var yaw = mc.thePlayer.rotationYaw;
+	var roundedStrafing = Math.max(-1, Math.min(1, Math.round(mc.thePlayer.moveStrafing * 100))),
+			roundedForward = Math.max(-1, Math.min(1, Math.round(mc.thePlayer.moveForward * 100)));
+	if (roundedStrafing !== 0)
+		yaw -= 90 * roundedStrafing * (roundedForward !== 0 ? roundedForward * 0.5 : 1);
+	if (roundedForward < 0) yaw += 180;
+	return yaw * Math.PI / 180;
+}
 script.registerModule({
 	name: "RedeVelocity",
 	category: "Combat",
 	description: "Redesky velocity",
+	settings: {
+	    packets: Setting.integer({
+		    name: "Packets",
+		    default: 1,
+		    min: 1,
+		    max: 20
+	    })
+	}
 }, function (module) {
 	module.on("packet", function (event) {
 		if (event.getPacket() instanceof S12PacketEntityVelocity) {
             var s12 = event.getPacket();
-            if (s12.getEntityID() != mc.thePlayer.getEntityId()) return;
-            mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(mc.thePlayer.posX + 31, mc.thePlayer.posY + 16, mc.thePlayer.posZ + 11, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, onGround));
-        }
+            if (s12.getEntityID() === mc.thePlayer.getEntityId()) {
+            	for (var i = 0; i < module.settings.packets.get(); i++) {
+					mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(mc.thePlayer.posX + 1.7E+24, mc.thePlayer.posY + 1.7E+24, mc.thePlayer.posZ + 1.7E+24, 
+						mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, mc.thePlayer.onGround));
+				}
+			}
+		}
     });
 });
 script.registerModule({
@@ -93,7 +133,7 @@ script.registerModule({
 });
 
 var killSults = [ "%s just got core'd!", "%s, imagine getting killed by a LiquidBounce free addon.", "RedeCore v2 is on top of %s!", 
-				"Get good, get RedeCore v2 ()" ];
+				"Get good, get RedeCore v2 (https://forums.ccbluex.net/topic/3813/redecore-v2)" ];
 
 function getRandomSult(name, private) {
 	if (private) return "/tell " + name + " " + killSults[Math.floor((Math.random()*killSults.length))].toString().replace("%s, ", "").replace("%s", "you");
