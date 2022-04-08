@@ -48,13 +48,13 @@ script.registerModule({
 			if (mc.thePlayer.onGround) {
 				mc.thePlayer.jump();
 			} else {
-  			mc.timer.timerSpeed = 2.0;
-                            mc.thePlayer.motionY += 0.01;
-                            mc.thePlayer.speedInAir = 0.08;
-                            var  motiony = mc.thePlayer.motionY;
+  			   mc.timer.timerSpeed = 3.5;
+                            mc.thePlayer.motionY += 0.07;
+                            mc.thePlayer.speedInAir = 0.4;
+                            var motiony = mc.thePlayer.motionY;
                             mc.thePlayer.jump();
-                            mc.thePlayer.motionX *= 0.79;
-                            mc.thePlayer.motionZ *= 0.79;
+                            mc.thePlayer.motionX *= 0.9;
+                            mc.thePlayer.motionZ *= 0.9;
                             mc.thePlayer.motionY = motiony;
 			}
         }
